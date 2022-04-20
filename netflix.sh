@@ -120,59 +120,64 @@ else
    echo -e "${Font_Green}你的 STEAM 货币为（仅限IPV4）: ${area}${Font_Suffix}";
 fi
 }
-DisneyPlus_v4() {
-echo -e "DisneyPlus：";
-    local result=`curl --connect-timeout 20 -4sSL "https://www.disneyplus.com/movies/drain-the-titanic/5VNZom2KYtlb" 2>&1`;    
-    if [[ "$result" == "curl"* ]];then
-        echo -n -e "${Font_Red}错误，无法连接到迪士尼+${Font_Suffix}\n";
-        return;
+
+Dazn_v4() {
+echo -e "Dazn：";
+    local result=$(curl -4 -s --max-time 30 -X POST -H "Content-Type: application/json" -d '{"LandingPageKey":"generic","Languages":"zh-CN,zh,en","Platform":"web","PlatformAttributes":{},"Manufacturer":"","PromoCode":"","Version":"2"}' https://startup.core.indazn.com/misl/v5/Startup  | python -m json.tool 2> /dev/null |grep GeolocatedCountryName |cut -d '"' -f4)
+
+	if [[ "$result" == "curl"* ]];then
+        	echo -n -e "${Font_Red}错误，无法连接到Dazn!${Font_Suffix}\n"
+        	return;
+    	fi
+	
+	if [ -n "$result" ]; then
+		if [[ "$result" == "null," ]];then
+			echo -n -e "${Font_Red}抱歉，您服务器所在的地区无法使用Dazn!${Font_Suffix}\n"
+			return;
+        else
+			echo -n -e "${Font_Green}恭喜，你服务器的IP支持Dazn! 区域：[${result}]${Font_Suffix}\n"
+			return;
+		fi
+	else
+		echo -n -e "${Font_Red}很遗憾，你的IP不支持Dazn!${Font_Suffix}\n"
+		return;
+
     fi
-    
-    if [[ "$result" == *"https://www.disneyplus.com/service-unavailable"* ]];then
-        echo -n -e "${Font_Red}抱歉，您所在的地区无法使用迪士尼+${Font_Suffix}\n";
-        return;
-    fi
-    if [[ "$result" == *"https://preview.disneyplus.com/unavailable/"* ]];then
-        echo -n -e "${Font_Red}抱歉，您所在的地区无法使用迪士尼+${Font_Suffix}\n";
-        return;
-    fi
-    if [[ "$result" == *"rating"* ]];then
-        echo -n -e "${Font_Green}恭喜，你的IP支持迪士尼+${Font_Suffix}\n";
-        return;
-    fi
-echo -n -e "\r ${Font_Red}很遗憾，你的IP不支持迪士尼+${Font_Suffix}\n";
     return;
 }
 
-DisneyPlus_v6() {
-echo -e "DisneyPlus：";
-    local result=`curl --connect-timeout 20 -6sSL "https://www.disneyplus.com/movies/drain-the-titanic/5VNZom2KYtlb" 2>&1`;
-    
-    if [[ "$result" == "curl"* ]];then
-        echo -n -e "${Font_Red}错误，无法连接到迪士尼+${Font_Suffix}\n";
-        return;
+Dazn_v6() {
+echo -e "Dazn：";
+    local result=$(curl -6 -s --max-time 30 -X POST -H "Content-Type: application/json" -d '{"LandingPageKey":"generic","Languages":"zh-CN,zh,en","Platform":"web","PlatformAttributes":{},"Manufacturer":"","PromoCode":"","Version":"2"}' https://startup.core.indazn.com/misl/v5/Startup  | python -m json.tool 2> /dev/null |grep GeolocatedCountryName |cut -d '"' -f4)
+
+	if [[ "$result" == "curl"* ]];then
+        	echo -n -e "${Font_Red}错误，无法连接到Dazn!${Font_Suffix}\n"
+        	return;
+    	fi
+	
+	if [ -n "$result" ]; then
+		if [[ "$result" == "null," ]];then
+			echo -n -e "${Font_Red}抱歉，您服务器所在的地区无法使用Dazn!${Font_Suffix}\n"
+			return;
+        else
+			echo -n -e "${Font_Green}恭喜，你服务器的IP支持Dazn! 区域：[${result}]${Font_Suffix}\n"
+			return;
+		fi
+	else
+		echo -n -e "${Font_Red}很遗憾，你的IP不支持Dazn!${Font_Suffix}\n"
+		return;
+
     fi
-    
-    if [[ "$result" == *"https://www.disneyplus.com/service-unavailable"* ]];then
-        echo -n -e "${Font_Red}抱歉，您所在的地区无法使用迪士尼+${Font_Suffix}\n";
-        return;
-    fi
-    if [[ "$result" == *"https://preview.disneyplus.com/unavailable/"* ]];then
-        echo -n -e "${Font_Red}抱歉，您所在的地区无法使用迪士尼+${Font_Suffix}\n";
-        return;
-    fi
-    
-    if [[ "$result" == *"rating"* ]];then
-        echo -n -e "${Font_Green}恭喜，你的IP支持迪士尼+${Font_Suffix}\n";
-        return;
-    fi
-echo -n -e "\r ${Font_Red}很遗憾，你的IP不支持迪士尼+${Font_Suffix}\n"; 
     return;
 }
+
+
+
+
 
 #目录
 
-echo -e "${Font_SkyBlue} 测试脚本 V2.9 ${Font_Suffix}"
+echo -e "${Font_SkyBlue} 流媒体测试脚本 V3.0 ${Font_Suffix}"
 echo -e "${Font_SkyBlue} GitHub：https://github.com/xb0or/nftest ${Font_Suffix}"
 echo -e "${Font_SkyBlue} bash <(curl -sSL "https://raw.githubusercontent.com/xb0or/nftest/main/netflix.sh") ${Font_Suffix}"
 echo -e "${Font_SkyBlue} 国家代码：http://www.loglogo.com/front/countryCode/ ${Font_Suffix}"
@@ -185,9 +190,9 @@ else
 test_ipv4
 yt_ipv4
 steam_v4
-DisneyPlus_v4
+Dazn_v4
 fi
-echo "-------------------------------------"
+echo "====================================="
 echo " ** 正在测试 IPv6 解锁情况";
 check6=`ping6 240c::6666 -c 1 2>&1`;
 if [[ "$check6" != *"received"* ]] && [[ "$check6" != *"transmitted"* ]];then
@@ -196,5 +201,6 @@ echo "-------------------------------------"
 else
     test_ipv6
     yt_ipv6
-    DisneyPlus_v6
+    Dazn_v6
+    echo "-------------------------------------"
 fi
